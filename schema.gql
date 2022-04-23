@@ -4,4 +4,21 @@
 
 type Query {
   Restaurants: Boolean!
+  users: Boolean!
+}
+
+type Mutation {
+  createUser(input: CreateUserInputDto!): Boolean!
+}
+
+input CreateUserInputDto {
+  email: String!
+  password: String!
+  role: UserRole!
+}
+
+enum UserRole {
+  CLIENT
+  DELIVERY
+  OWNER
 }
