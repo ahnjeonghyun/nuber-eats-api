@@ -4,7 +4,10 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { RestaurantsModule } from './restaurants/restaurants.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
+import { UserModule } from './users/user.module';
 import * as Joi from 'joi';
+import { UserEntity } from './users/entities/users.entity';
+import { CommonModule } from './common/common.module';
 
 @Module({
   imports: [
@@ -31,10 +34,14 @@ import * as Joi from 'joi';
       port: +process.env.DB_PORT,
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
       synchronize: true,
       logging: true,
+      entities: [UserEntity],
     }),
     RestaurantsModule,
+    UserModule,
+    CommonModule,
   ],
   controllers: [],
   providers: [],
