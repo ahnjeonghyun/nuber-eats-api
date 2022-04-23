@@ -4,7 +4,7 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { RestaurantsModule } from './restaurants/restaurants.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
-import { UserModule } from './users/user.module';
+import { UsersModule } from './users/users.module';
 import * as Joi from 'joi';
 import { UserEntity } from './users/entities/users.entity';
 import { CommonModule } from './common/common.module';
@@ -40,7 +40,7 @@ import { CommonModule } from './common/common.module';
       entities: [UserEntity],
     }),
     RestaurantsModule,
-    UserModule,
+    UsersModule,
     CommonModule,
   ],
   controllers: [],
