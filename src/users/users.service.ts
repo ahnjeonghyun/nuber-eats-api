@@ -2,10 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entities/users.entity';
 import { Repository } from 'typeorm';
-import {
-  CreateUserInputDto,
-  CreateUserOutPutDto,
-} from './dto/create-user-input-dto';
+import { CreateUserDto, CreateUserOutPutDto } from './dto/create-user-dto';
+import { LoginInputDto, LoginOutputDto } from './dto/login-dto';
 
 @Injectable()
 export class UsersService {
@@ -18,7 +16,7 @@ export class UsersService {
     email,
     password,
     role,
-  }: CreateUserInputDto): Promise<CreateUserOutPutDto> {
+  }: CreateUserDto): Promise<CreateUserOutPutDto> {
     try {
       const exists = await this.UserEntityRepository.findOne({ email });
 
@@ -32,6 +30,24 @@ export class UsersService {
       return { ok: true };
     } catch (e) {
       return { ok: false, error: "Couldn't create account" };
+    }
+  }
+
+  async login({ email, password }: LoginInputDto): Promise<LoginOutputDto> {
+    try {
+      const user = await this.UserEntityRepository.findOne({ email });
+      if (!user) {
+        return { ok: false, error: 'User not found' };
+      }
+
+      const checkPassword = await user.checkPassword(password);
+      if (!checkPassword) {
+        return { ok: false, error: 'Wrong password' };
+      }
+
+      return { ok: true, token: '' };
+    } catch (e) {
+      return { ok: false, error: 'error' };
     }
   }
 }

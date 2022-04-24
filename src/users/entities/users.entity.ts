@@ -8,6 +8,7 @@ import {
 } from '@nestjs/graphql';
 import * as bcrypt from 'bcrypt';
 import { InternalServerErrorException } from '@nestjs/common';
+import { IsEmail, IsEnum } from 'class-validator';
 
 enum UserRole {
   CLIENT,
@@ -23,6 +24,7 @@ registerEnumType(UserRole, { name: 'UserRole' });
 export class UserEntity extends CoreEntity {
   @Column()
   @Field(() => String)
+  @IsEmail()
   email: string;
 
   @Column()
@@ -31,6 +33,7 @@ export class UserEntity extends CoreEntity {
 
   @Column({ type: 'enum', enum: UserRole })
   @Field(() => UserRole)
+  @IsEnum(UserRole)
   role: UserRole;
 
   @BeforeInsert()
@@ -40,6 +43,14 @@ export class UserEntity extends CoreEntity {
     } catch (e) {
       console.log(e);
       throw new InternalServerErrorException();
+    }
+  }
+
+  async checkPassword(password: string): Promise<boolean> {
+    try {
+      return bcrypt.compare(password, this.password);
+    } catch (error) {
+      throw new InternalServerErrorException(error);
     }
   }
 }
