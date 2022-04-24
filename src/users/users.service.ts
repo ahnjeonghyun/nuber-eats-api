@@ -15,20 +15,17 @@ export class UsersService {
     email,
     password,
     role,
-  }: CreateUserInputDto): Promise<boolean> {
+  }: CreateUserInputDto): Promise<string | undefined> {
     try {
-      const exist = await this.UserEntityRepository.findOne({ email });
-      if (exist) {
-        return false;
+      const exists = await this.UserEntityRepository.findOne({ email });
+      if (exists) {
+        return 'There is a user with that email already';
       }
-
       await this.UserEntityRepository.save(
-        await this.UserEntityRepository.create({ email, password, role }),
+        this.UserEntityRepository.create({ email, password, role }),
       );
-
-      return true;
-    } catch (error) {
-      return false;
+    } catch (e) {
+      return "Couldn't create account";
     }
   }
 }
