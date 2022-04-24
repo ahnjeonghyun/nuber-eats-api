@@ -2,13 +2,18 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type CreateUserOutPutDto {
+  ok: Boolean!
+  error: String
+}
+
 type Query {
   Restaurants: Boolean!
   users: Boolean!
 }
 
 type Mutation {
-  createUser(input: CreateUserInputDto!): Boolean!
+  createUser(input: CreateUserInputDto!): CreateUserOutPutDto!
 }
 
 input CreateUserInputDto {

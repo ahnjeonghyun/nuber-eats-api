@@ -15,7 +15,7 @@ export class UsersResolver {
     return true;
   }
 
-  @Mutation(() => Boolean)
+  @Mutation(() => CreateUserOutPutDto)
   async createUser(
     @Args('input') input: CreateUserInputDto,
   ): Promise<CreateUserOutPutDto> {
@@ -26,7 +26,7 @@ export class UsersResolver {
         return { ok, error };
       }
 
-      return { ok };
+      return { ok, error };
     } catch (error) {
       return {
         ok: false,
