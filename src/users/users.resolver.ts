@@ -20,20 +20,17 @@ export class UsersResolver {
     @Args('input') input: CreateUserInputDto,
   ): Promise<CreateUserOutPutDto> {
     try {
-      const error = await this.usersService.createUser(input);
+      const { ok, error } = await this.usersService.createUser(input);
+
       if (error) {
-        return {
-          ok: false,
-          error,
-        };
+        return { ok, error };
       }
-      return {
-        ok: true,
-      };
+
+      return { ok };
     } catch (error) {
       return {
-        error,
         ok: false,
+        error,
       };
     }
   }

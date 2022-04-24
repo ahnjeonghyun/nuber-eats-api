@@ -10,9 +10,9 @@ export class CreateUserInputDto extends PickType(UserEntity, [
 
 @ObjectType()
 export class CreateUserOutPutDto {
-  @Field(() => String, { nullable: true })
-  error?: string;
-
   @Field(() => Boolean)
   ok: boolean;
+
+  @Field(() => String, { nullable: true })
+  error?: string;
 }
