@@ -29,7 +29,6 @@ export class UsersService {
       await this.UserEntityRepository.save(
         this.UserEntityRepository.create({ email, password, role }),
       );
-
       return { ok: true };
     } catch (e) {
       return { ok: false, error: "Couldn't create account" };
