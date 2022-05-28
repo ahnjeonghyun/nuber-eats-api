@@ -3,13 +3,12 @@ import { UserEntity } from '../entities/users.entity';
 import { CoreOutputDto } from '../../common/dto/core-output.dto';
 
 @InputType()
-export class LoginInputDto extends PickType(UserEntity, [
-  'email',
-  'password',
+export class UserProfileInputDto extends PickType(UserEntity, [
+  'id',
 ] as const) {}
 
 @ObjectType()
-export class LoginOutputDto extends CoreOutputDto {
-  @Field(() => String, { nullable: true })
-  token?: string;
+export class UserProfileOutputDto extends CoreOutputDto {
+  @Field(() => UserEntity, { nullable: true })
+  user?: UserEntity;
 }

@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { CreateUserDto, CreateUserOutPutDto } from './dto/create-user-dto';
 import { LoginInputDto, LoginOutputDto } from './dto/login-dto';
 import { JwtService } from '../jwt/jwt.service';
+import { EditProfileInputDto } from './dto/edit-profile.dto';
 
 @Injectable()
 export class UsersService {
@@ -60,5 +61,19 @@ export class UsersService {
     } catch (e) {
       throw new InternalServerErrorException(e);
     }
+  }
+
+  async editProfile(
+    id: number,
+    input: EditProfileInputDto,
+  ): Promise<UserEntity> {
+    const user = await this.userEntityRepository.findOne(id);
+    if (input.email) {
+      user.email = input.email;
+    }
+    if (input.password) {
+      user.password = input.password;
+    }
+    return await this.userEntityRepository.save(user);
   }
 }
