@@ -9,6 +9,7 @@ import {
 import * as bcrypt from 'bcrypt';
 import { InternalServerErrorException } from '@nestjs/common';
 import { IsEmail, IsEnum } from 'class-validator';
+import { HideField } from '@nestjs/graphql/dist/decorators/hide-field.decorator';
 
 enum UserRole {
   CLIENT,
@@ -28,7 +29,7 @@ export class UserEntity extends CoreEntity {
   email: string;
 
   @Column()
-  @Field(() => String)
+  @HideField()
   password: string;
 
   @Column({ type: 'enum', enum: UserRole })

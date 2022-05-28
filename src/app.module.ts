@@ -31,6 +31,9 @@ import { JwtMiddleware } from './jwt/jwt.middleware';
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: 'schema.gql',
+      context: ({ req }) => ({
+        user: req.user,
+      }),
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
