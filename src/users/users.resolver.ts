@@ -1,8 +1,11 @@
-import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { UsersService } from './users.service';
 import { UserEntity } from './entities/users.entity';
 import { CreateUserDto, CreateUserOutPutDto } from './dto/create-user-dto';
 import { LoginInputDto, LoginOutputDto } from './dto/login-dto';
+import { UseGuards } from '@nestjs/common';
+import { AuthGuard } from '../auth/auth.guard';
+import { CurrentUser } from '../auth/auth-user.decorator';
 
 @Resolver(() => UserEntity)
 export class UsersResolver {
@@ -39,10 +42,8 @@ export class UsersResolver {
   }
 
   @Query(() => UserEntity)
-  async me(@Context() context): Promise<UserEntity> {
-    if (!context.user) {
-      return;
-    }
-    return context.user;
+  @UseGuards(AuthGuard)
+  async me(@CurrentUser() user: UserEntity): Promise<UserEntity> {
+    return user;
   }
 }
