@@ -2,6 +2,17 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type UserEntity {
+  email: String!
+  role: UserRole!
+}
+
+enum UserRole {
+  CLIENT
+  DELIVERY
+  OWNER
+}
+
 type CreateUserOutPutDto {
   ok: Boolean!
   error: String
@@ -16,6 +27,7 @@ type LoginOutputDto {
 type Query {
   Restaurants: Boolean!
   users: Boolean!
+  me: UserEntity!
 }
 
 type Mutation {
@@ -25,17 +37,9 @@ type Mutation {
 
 input CreateUserDto {
   email: String!
-  password: String!
   role: UserRole!
-}
-
-enum UserRole {
-  CLIENT
-  DELIVERY
-  OWNER
 }
 
 input LoginInputDto {
   email: String!
-  password: String!
 }
