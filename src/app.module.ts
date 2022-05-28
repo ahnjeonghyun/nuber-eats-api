@@ -7,7 +7,6 @@ import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
 import * as Joi from 'joi';
 import { UserEntity } from './users/entities/users.entity';
-import { CommonModule } from './common/common.module';
 import { JwtModule } from './jwt/jwt.module';
 import { MiddlewareConsumer } from '@nestjs/common/interfaces/middleware/middleware-consumer.interface';
 import { JwtMiddleware } from './jwt/jwt.middleware';
@@ -49,7 +48,6 @@ import { JwtMiddleware } from './jwt/jwt.middleware';
     JwtModule.forRoot({ privateKey: process.env.SECRET_KEY }),
     RestaurantsModule,
     UsersModule,
-    CommonModule,
   ],
   controllers: [],
   providers: [],
