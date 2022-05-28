@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entities/users.entity';
 import { Repository } from 'typeorm';
@@ -51,6 +51,14 @@ export class UsersService {
       return { ok: true, token };
     } catch (e) {
       return { ok: false, error: 'error' };
+    }
+  }
+
+  async findById(id: number): Promise<UserEntity> {
+    try {
+      return await this.userEntityRepository.findOne({ id });
+    } catch (e) {
+      throw new InternalServerErrorException(e);
     }
   }
 }
