@@ -1,17 +1,25 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entities/users.entity';
 import { Repository } from 'typeorm';
 import { CreateUserDto, CreateUserOutPutDto } from './dto/create-user-dto';
 import { LoginInputDto, LoginOutputDto } from './dto/login-dto';
 import { JwtService } from '../jwt/jwt.service';
-import { EditProfileInputDto } from './dto/edit-profile.dto';
+import {
+  EditProfileInputDto,
+  EditProfileOutputDto,
+} from './dto/edit-profile.dto';
+import { VerificationEntity } from './entities/verification.entity';
+import { VerifyEmailOutputDto } from './dto/verify-email.dto';
+import { UserProfileOutputDto } from './dto/user-profilet.dto';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userEntityRepository: Repository<UserEntity>,
+    @InjectRepository(VerificationEntity)
+    private readonly verificationEntityRepository: Repository<VerificationEntity>,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -27,8 +35,13 @@ export class UsersService {
         return { ok: false, error: 'There is a user with that email already' };
       }
 
-      await this.userEntityRepository.save(
+      const user = await this.userEntityRepository.save(
         this.userEntityRepository.create({ email, password, role }),
+      );
+      await this.verificationEntityRepository.save(
+        this.verificationEntityRepository.create({
+          user,
+        }),
       );
       return { ok: true };
     } catch (e) {
@@ -38,7 +51,10 @@ export class UsersService {
 
   async login({ email, password }: LoginInputDto): Promise<LoginOutputDto> {
     try {
-      const user = await this.userEntityRepository.findOne({ email });
+      const user = await this.userEntityRepository.findOne(
+        { email },
+        { select: ['password', 'id'] },
+      );
       if (!user) {
         return { ok: false, error: 'User not found' };
       }
@@ -55,25 +71,55 @@ export class UsersService {
     }
   }
 
-  async findById(id: number): Promise<UserEntity> {
+  async findById(id: number): Promise<UserProfileOutputDto> {
     try {
-      return await this.userEntityRepository.findOne({ id });
-    } catch (e) {
-      throw new InternalServerErrorException(e);
+      const user = await this.userEntityRepository.findOne({ id });
+      if (!user) {
+        throw new Error('User Not Found');
+      }
+      return { ok: true, user };
+    } catch (error) {
+      return { ok: false, error };
     }
   }
 
   async editProfile(
     id: number,
     input: EditProfileInputDto,
-  ): Promise<UserEntity> {
-    const user = await this.userEntityRepository.findOne(id);
-    if (input.email) {
-      user.email = input.email;
+  ): Promise<EditProfileOutputDto> {
+    try {
+      const user = await this.userEntityRepository.findOne(id);
+      if (input.email) {
+        user.email = input.email;
+        user.verified = false;
+        await this.verificationEntityRepository.save(
+          this.verificationEntityRepository.create({ user }),
+        );
+      }
+      if (input.password) {
+        user.password = input.password;
+      }
+      await this.userEntityRepository.save(user);
+      return { ok: true };
+    } catch (error) {
+      return { ok: false, error };
     }
-    if (input.password) {
-      user.password = input.password;
+  }
+
+  async verifyEmail(code: string): Promise<VerifyEmailOutputDto> {
+    try {
+      const verification = await this.verificationEntityRepository.findOne(
+        { code },
+        { relations: ['user'] },
+      );
+      if (verification) {
+        verification.user.verified = true;
+        await this.userEntityRepository.save(verification.user);
+        return { ok: true };
+      }
+      return { ok: false, error: 'Verification not found.' };
+    } catch (error) {
+      return { ok: false, error };
     }
-    return await this.userEntityRepository.save(user);
   }
 }
