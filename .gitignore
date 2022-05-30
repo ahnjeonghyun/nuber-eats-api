@@ -5,7 +5,7 @@
 ./dist
 *.env
 *.eslintrc.json
-*.gql
+schema.gql
 
 # Logs
 logs

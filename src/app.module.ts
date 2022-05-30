@@ -10,6 +10,7 @@ import { UserEntity } from './users/entities/users.entity';
 import { JwtModule } from './jwt/jwt.module';
 import { MiddlewareConsumer } from '@nestjs/common/interfaces/middleware/middleware-consumer.interface';
 import { JwtMiddleware } from './jwt/jwt.middleware';
+import { VerificationEntity } from './users/entities/verification.entity';
 
 @Module({
   imports: [
@@ -43,7 +44,7 @@ import { JwtMiddleware } from './jwt/jwt.middleware';
       database: process.env.DB_NAME,
       synchronize: true,
       logging: true,
-      entities: [UserEntity],
+      entities: [UserEntity, VerificationEntity],
     }),
     JwtModule.forRoot({ privateKey: process.env.SECRET_KEY }),
     RestaurantsModule,
