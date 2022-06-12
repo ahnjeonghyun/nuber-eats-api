@@ -1,17 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserEntity } from './entities/users.entity';
 import { Repository } from 'typeorm';
-import { CreateUserDto, CreateUserOutPutDto } from './dto/create-user-dto';
-import { LoginInputDto, LoginOutputDto } from './dto/login-dto';
+
 import { JwtService } from '../jwt/jwt.service';
+import { MailService } from '../mail/mail.service';
+import { CreateUserDto, CreateUserOutPutDto } from './dto/create-user-dto';
 import {
   EditProfileInputDto,
   EditProfileOutputDto,
 } from './dto/edit-profile.dto';
-import { VerificationEntity } from './entities/verification.entity';
-import { VerifyEmailOutputDto } from './dto/verify-email.dto';
+import { LoginInputDto, LoginOutputDto } from './dto/login-dto';
 import { UserProfileOutputDto } from './dto/user-profilet.dto';
+import { VerifyEmailOutputDto } from './dto/verify-email.dto';
+import { UserEntity } from './entities/users.entity';
+import { VerificationEntity } from './entities/verification.entity';
 
 @Injectable()
 export class UsersService {
@@ -21,6 +23,7 @@ export class UsersService {
     @InjectRepository(VerificationEntity)
     private readonly verificationEntityRepository: Repository<VerificationEntity>,
     private readonly jwtService: JwtService,
+    private readonly mailService: MailService,
   ) {}
 
   async createUser({
@@ -38,11 +41,12 @@ export class UsersService {
       const user = await this.userEntityRepository.save(
         this.userEntityRepository.create({ email, password, role }),
       );
-      await this.verificationEntityRepository.save(
+      const verification = await this.verificationEntityRepository.save(
         this.verificationEntityRepository.create({
           user,
         }),
       );
+      this.mailService.sendVerificationEmail(user.email, verification.code);
       return { ok: true };
     } catch (e) {
       return { ok: false, error: "Couldn't create account" };
@@ -92,14 +96,16 @@ export class UsersService {
       if (input.email) {
         user.email = input.email;
         user.verified = false;
-        await this.verificationEntityRepository.save(
+        const verification = await this.verificationEntityRepository.save(
           this.verificationEntityRepository.create({ user }),
         );
+        this.mailService.sendVerificationEmail(user.email, verification.code);
       }
       if (input.password) {
         user.password = input.password;
       }
       await this.userEntityRepository.save(user);
+
       return { ok: true };
     } catch (error) {
       return { ok: false, error };
@@ -115,8 +121,10 @@ export class UsersService {
       if (verification) {
         verification.user.verified = true;
         await this.userEntityRepository.save(verification.user);
+        await this.verificationEntityRepository.delete({ id: verification.id });
         return { ok: true };
       }
+
       return { ok: false, error: 'Verification not found.' };
     } catch (error) {
       return { ok: false, error };
