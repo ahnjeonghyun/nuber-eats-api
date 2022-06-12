@@ -1,16 +1,18 @@
-import { Module, NestModule, RequestMethod } from '@nestjs/common';
-import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { RestaurantsModule } from './restaurants/restaurants.module';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule } from '@nestjs/config';
-import { UsersModule } from './users/users.module';
-import * as Joi from 'joi';
-import { UserEntity } from './users/entities/users.entity';
-import { JwtModule } from './jwt/jwt.module';
+import { Module, NestModule, RequestMethod } from '@nestjs/common';
 import { MiddlewareConsumer } from '@nestjs/common/interfaces/middleware/middleware-consumer.interface';
+import { ConfigModule } from '@nestjs/config';
+import { GraphQLModule } from '@nestjs/graphql';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import * as Joi from 'joi';
+
 import { JwtMiddleware } from './jwt/jwt.middleware';
+import { JwtModule } from './jwt/jwt.module';
+import { MailModule } from './mail/mail.module';
+import { RestaurantsModule } from './restaurants/restaurants.module';
+import { UserEntity } from './users/entities/users.entity';
 import { VerificationEntity } from './users/entities/verification.entity';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -26,6 +28,9 @@ import { VerificationEntity } from './users/entities/verification.entity';
         DB_PASSWORD: Joi.string().required(),
         DB_NAME: Joi.string().required(),
         SECRET_KEY: Joi.string().required(),
+        MAILGUN_API_KEY: Joi.string().required(),
+        MAILGUN_DOMAIN_NAME: Joi.string().required(),
+        MAILGUN_FROM_EMAIL: Joi.string().required(),
       }),
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
@@ -47,6 +52,11 @@ import { VerificationEntity } from './users/entities/verification.entity';
       entities: [UserEntity, VerificationEntity],
     }),
     JwtModule.forRoot({ privateKey: process.env.SECRET_KEY }),
+    MailModule.forRoot({
+      apiKey: process.env.MAILGUN_API_KEY,
+      emailDomain: process.env.MAILGUN_DOMAIN_NAME,
+      fromEmail: process.env.MAILGUN_FROM_EMAIL,
+    }),
     RestaurantsModule,
     UsersModule,
   ],
