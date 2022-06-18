@@ -16,8 +16,8 @@ export class RestaurantsEntity extends CoreEntity {
   @Length(5)
   name: string;
 
-  @Column()
-  @Field(() => String)
+  @Column({ nullable: true })
+  @Field(() => String, { nullable: true })
   @IsString()
   coverImg: string;
 
@@ -37,7 +37,7 @@ export class RestaurantsEntity extends CoreEntity {
 
   @ManyToOne(() => UserEntity, (user) => user.restaurants, {
     nullable: true,
-    onDelete: 'SET NULL',
+    onDelete: 'CASCADE',
   })
   @Field(() => UserEntity, { nullable: true })
   owner: UserEntity;
