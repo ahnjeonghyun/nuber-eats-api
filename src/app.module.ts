@@ -9,6 +9,8 @@ import * as Joi from 'joi';
 import { JwtMiddleware } from './jwt/jwt.middleware';
 import { JwtModule } from './jwt/jwt.module';
 import { MailModule } from './mail/mail.module';
+import { CategoryEntity } from './restaurants/entities/category.entity';
+import { RestaurantsEntity } from './restaurants/entities/restaurants.entity';
 import { RestaurantsModule } from './restaurants/restaurants.module';
 import { UserEntity } from './users/entities/users.entity';
 import { VerificationEntity } from './users/entities/verification.entity';
@@ -49,7 +51,12 @@ import { UsersModule } from './users/users.module';
       database: process.env.DB_NAME,
       synchronize: true,
       logging: true,
-      entities: [UserEntity, VerificationEntity],
+      entities: [
+        UserEntity,
+        VerificationEntity,
+        RestaurantsEntity,
+        CategoryEntity,
+      ],
     }),
     JwtModule.forRoot({ privateKey: process.env.SECRET_KEY }),
     MailModule.forRoot({
@@ -57,8 +64,8 @@ import { UsersModule } from './users/users.module';
       emailDomain: process.env.MAILGUN_DOMAIN_NAME,
       fromEmail: process.env.MAILGUN_FROM_EMAIL,
     }),
-    RestaurantsModule,
     UsersModule,
+    RestaurantsModule,
   ],
   controllers: [],
   providers: [],
