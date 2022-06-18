@@ -15,10 +15,15 @@ export class CategoryEntity extends CoreEntity {
   @Length(5)
   name: string;
 
-  @Column()
-  @Field(() => String)
+  @Column({ nullable: true })
+  @Field(() => String, { nullable: true })
   @IsString()
   iconImg: string;
+
+  @Column({ unique: true })
+  @Field(() => String)
+  @IsString()
+  slug: string;
 
   @OneToMany(() => RestaurantsEntity, (restaurants) => restaurants.category)
   @Field(() => [RestaurantsEntity], { nullable: true })

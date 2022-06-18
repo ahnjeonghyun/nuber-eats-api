@@ -7,7 +7,8 @@ type CategoryEntity {
   createdAt: DateTime!
   updatedAt: DateTime!
   name: String!
-  iconImg: String!
+  iconImg: String
+  slug: String!
   restaurants: [RestaurantsEntity!]
 }
 
@@ -21,7 +22,7 @@ type RestaurantsEntity {
   createdAt: DateTime!
   updatedAt: DateTime!
   name: String!
-  coverImg: String!
+  coverImg: String
   address: String!
   category: CategoryEntity
   owner: UserEntity
@@ -42,6 +43,11 @@ enum UserRole {
   CLIENT
   DELIVERY
   OWNER
+}
+
+type CreateRestaurantOutputDto {
+  ok: Boolean!
+  error: String
 }
 
 type CreateUserOutPutDto {
@@ -74,7 +80,6 @@ type VerifyEmailOutputDto {
 type Query {
   me: UserEntity!
   userProfile(input: UserProfileInputDto!): UserProfileOutputDto!
-  Restaurants: Boolean!
 }
 
 input UserProfileInputDto {
@@ -86,6 +91,7 @@ type Mutation {
   login(input: LoginInputDto!): LoginOutputDto!
   editProfile(input: EditProfileInputDto!): EditProfileOutputDto!
   verifyEmail(input: VerifyEmailInputDto!): VerifyEmailOutputDto!
+  createRestaurant(input: CreateRestaurantInputDto!): CreateRestaurantOutputDto!
 }
 
 input CreateUserDto {
@@ -106,4 +112,11 @@ input EditProfileInputDto {
 
 input VerifyEmailInputDto {
   code: String!
+}
+
+input CreateRestaurantInputDto {
+  name: String!
+  coverImg: String
+  address: String = "강남"
+  categoryName: String!
 }
